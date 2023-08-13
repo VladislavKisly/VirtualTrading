@@ -50,9 +50,16 @@ class Database():
             if x['user_id'] == user_id:
                 return x['start_summ'] + x['profit']
             
-    def get_position(self, user_id: int):
-        data = self.__read_data()
+    def get_position(self, user_id: int, ticker: str):
+        data = self.__read_positions()
+        positions = []
         for x in data:
             if x['user_id'] == user_id:
-                return x['positions']
+                for d in x['positions']:
+                    if d['ticker'] == ticker:
+                        positions.append(d)
+        return positions
+    
+            
+    
             

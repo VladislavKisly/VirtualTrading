@@ -1,0 +1,29 @@
+[
+    {
+        "user_id": 657512169,
+        "positions": [
+            {
+                "ticker": "BTCUSDT",
+                "value": 100,
+                "price": 28000,
+                "side": "LONG"
+            },
+            {
+                "ticker": "ETHUSDT",
+                "value": 100,
+                "price": 28001
+            },
+            {
+                "ticker": "BTCUSDT",
+                "value": 100,
+                "price": 28002,
+                "side": "SHORT"
+            },
+            {
+                "ticker": "ETHUSDT",
+                "value": 100,
+                "price": 28000
+            }
+        ]
+    }
+]
