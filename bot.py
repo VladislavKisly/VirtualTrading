@@ -26,6 +26,7 @@ from telegram.constants import ParseMode, ChatAction
 
 from config import telegram_token
 from components import keyboards, messages
+from utils.exchanges.binance import BinanceData
 from database import Database
 
 TICKER_POS = range(1)
@@ -70,59 +71,86 @@ async def my_positions_handle(update: Update, context: CallbackContext):
     return TICKER_POS
 
 async def create_position(update: Update, context: CallbackContext):
-    side = update.callback_query.data.split('|')[1]
+    side = None
+
     text = messages.create_position()
     keyboard = keyboards.to_menu_keyboard()
-    await update.callback_query.edit_message_text(text, reply_markup=keyboard)
+
+    if update.callback_query == None:
+        side = context.user_data['side']
+        await update.message.reply_text(text,
+                                            reply_markup=keyboard)
+    else:
+        side = update.callback_query.data.split('|')[1]
+        await update.callback_query.edit_message_text(text, reply_markup=keyboard)
+
     context.user_data['side'] = side
     return GET_TICKER
 
 async def get_ticker_create_position(update: Update, context: CallbackContext):
     # TODO: Проверка на существование
     ticker = update.message.text
+    data = BinanceData().get_prices(ticker)
+
+    if type(data) is not dict: await create_position(update, context)
+    
     context.user_data['ticker'] = ticker
     text = messages.create_position_price_info()
     keyboard = keyboards.to_menu_keyboard()
+    
     await update.message.reply_text(text, 
                                         reply_markup=keyboard)
+    
     return GET_PRICE
 
 async def get_price(update: Update, context: CallbackContext):
     price = update.message.text
     context.user_data['price'] = price
+    
     text = messages.create_position_profit_info()
     keyboard = keyboards.to_menu_keyboard()
+    
     await update.message.reply_text(text,
                                         reply_markup=keyboard)
+    
     return GET_TAKE_PROFIT
 
 async def get_take_profit(update: Update, context: CallbackContext):
     profit = update.message.text
     context.user_data['take_profit'] = profit
+    
     text = messages.create_position_stop_info()
     keyboard = keyboards.to_menu_keyboard()
+    
     await update.message.reply_text(text,
                                         reply_markup=keyboard)
+    
     return GET_STOP_LOSS
 
 async def get_stop_loss(update: Update, context: CallbackContext):
     # TODO: Проверка на больше меньше профита
     stop_loss = update.message.text
     context.user_data['stop_loss'] = stop_loss
+    
     text = messages.create_position_value_info()
     keyboard = keyboards.to_menu_keyboard()
+   
     await update.message.reply_text(text,
                                         reply_markup=keyboard)
+    
     return GET_VALUE
     
 async def get_value(update: Update, context: CallbackContext):
     # TODO: Проверка на использованный объем
     value = update.message.text
     context.user_data['value'] = value
+    
     text = messages.create_position_leverage_info()
     keyboard = keyboards.to_menu_keyboard()
+    
     await update.message.reply_text(text,
                                         reply_markup=keyboard)
+    
     return GET_LEVERAGE
 
 async def get_leverage(update: Update, context: CallbackContext):
